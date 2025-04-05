@@ -26,7 +26,6 @@ def generate_food():
 
 food = generate_food()
 
-#Game variables
 running = True
 clock = pygame.time.Clock()
 speed = 10
@@ -34,7 +33,6 @@ score = 0
 level = 1
 food_eaten = 0
 
-# Font for displaying score and level
 font = pygame.font.Font(None, 36)
 
 while running:
@@ -56,43 +54,38 @@ while running:
     if keys[pygame.K_RIGHT] and snake_dir != (-CELL_SIZE, 0):
         snake_dir = (CELL_SIZE, 0)
     
-    # Move snake
     new_head = (snake[0][0] + snake_dir[0], snake[0][1] + snake_dir[1])
     
-    # Check for wall collision
     if new_head[0] < 0 or new_head[0] >= WIDTH or new_head[1] < 0 or new_head[1] >= HEIGHT:
-        running = False # End game if hit wall
+        running = False 
     
-    # Check for self-collision
     if new_head in snake:
         running = False
     
     snake.insert(0, new_head)
     
-    # Check if food is eaten
     if new_head == food:
         food = generate_food()
         score += 10
         foods_eaten += 1
         
-        # Level up system
         if foods_eaten % 4 == 0:
             level += 1
             speed += 2
     else:
         snake.pop()
     
-    # Drawing section
+
     screen.fill(WHITE)
     
-    # Draw snake
+
     for segment in snake:
         pygame.draw.rect(screen, GREEN, (segment[0], segment[1], CELL_SIZE, CELL_SIZE))
     
-    # Draw food
+
     pygame.draw.rect(screen, RED, (food[0], food[1], CELL_SIZE, CELL_SIZE))
+
     
-    # Display score and level
     score_text = font.render(f"Score: {score}", True, BLUE)
     level_text = font.render(f"Level: {level}", True, BLUE)
     screen.blit(score_text, (10, 10))
