@@ -21,7 +21,7 @@ font = pygame.font.SysFont("Verdana", 60)
 font_small = pygame.font.SysFont("Verdana", 20)
 game_over = font.render("Game Over", True, Black)
 
-background = pygame.image.load("AnimatedStreet.png")
+background = pygame.image.load()
 
 
 DISPLAYSURF = pygame.display.set_mode((400,600))
@@ -31,7 +31,7 @@ pygame.display.set_caption("Game")
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__() 
-        self.image = pygame.image.load("Enemy.png")
+        self.image = pygame.image.load()
         self.rect = self.image.get_rect()
         self.rect.center=(random.randint(40,SCREEN_WIDTH-40),0)
 
@@ -51,7 +51,7 @@ class Enemy(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("Player.png")
+        self.image = pygame.image.load()
         self.rect = self.image.get_rect()
         self.rect.center = (160, 520)
 
@@ -94,10 +94,10 @@ while True:
         entity.move()
  
     if pygame.sprite.spritecollideany(P1, enemies):
-          pygame.mixer.Sound('crash.wav').play()
+          pygame.mixer.Sound().play()
           time.sleep(0.5)
                     
-          DISPLAYSURF.fill(RED)
+          DISPLAYSURF.fill(Red)
           DISPLAYSURF.blit(game_over, (30,250))
            
           pygame.display.update()

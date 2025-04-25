@@ -13,12 +13,21 @@ BLACK = (0, 0, 0)
 RED = (200, 0, 0)
 YELLOW = (255, 255, 0)
 
+background = pygame.image.load(r"C:\Users\user\OneDrive\Desktop\PP2Labs\Lab9\background.jpg")  
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))  
+
+
+
 PLAYER_IMG = pygame.Surface((50, 100))
-PLAYER_IMG.fill(RED)
-
+PLAYER_IMG = pygame.image.load(r"C:\Users\user\OneDrive\Desktop\PP2Labs\Lab9\car.png")
+PLAYER_IMG = pygame.transform.scale(PLAYER_IMG, (100,50))  
+PLAYER_IMG = pygame.transform.rotate(PLAYER_IMG, 90)  
 ENEMY_IMG = pygame.Surface((50, 100))
-ENEMY_IMG.fill(BLACK)
+ENEMY_IMG = pygame.image.load(r"C:\Users\user\OneDrive\Desktop\PP2Labs\Lab9\enemy.png")
+ENEMY_IMG = pygame.transform.scale(ENEMY_IMG, (100,90))
+ENEMY_IMG = pygame.transform.rotate(ENEMY_IMG,270)  
 
+            
 def draw_coin(weight):
     color = YELLOW if weight == 1 else (255, 165, 0)  
     surface = pygame.Surface((30, 30), pygame.SRCALPHA)

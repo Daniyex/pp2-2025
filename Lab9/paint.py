@@ -7,7 +7,6 @@ WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Paint Shapes")
 
-# Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (50, 150, 255)
@@ -80,7 +79,7 @@ while running:
     screen.fill(WHITE)
     draw_saved_shapes()
     draw_ui()
-
+ 
     if drawing and start_pos:
         if shape == "square":
             draw_square(screen, start_pos, pygame.mouse.get_pos())

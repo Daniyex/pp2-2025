@@ -2,19 +2,17 @@ import pygame
 
 pygame.init()
 
-# Screen setup
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Drawing App")
 clock = pygame.time.Clock()
 
-# Variables
 radius = 5
-mode = 'blue'  # Default color mode
-drawing_mode = 'free'  # Can be 'free', 'rect', 'circle', or 'eraser'
+mode = 'blue'  
+drawing_mode = 'free'  
 points = []
 current_color = (0, 0, 255)
-#start_pos 
+ 
 
 def drawLineBetween(screen, index, start, end, width, color):
     dx = start[0] - end[0]
@@ -43,19 +41,19 @@ while running:
                 current_color = (0, 0, 0)
             elif event.key == pygame.K_f:
                 drawing_mode = 'free'
-                current_color = (0, 0, 255)  # Reset to default blue
+                current_color = (0, 0, 255)  
             elif event.key == pygame.K_1:
-                current_color = (0, 0, 255)  # Blue
+                current_color = (0, 0, 255)   
             elif event.key == pygame.K_2:
-                current_color = (255, 0, 0)  # Red
+                current_color = (255, 0, 0) 
             elif event.key == pygame.K_3:
-                current_color = (0, 255, 0)  # Green
+                current_color = (0, 255, 0)  
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:  # Left click
+            if event.button == 1:  
                 start_pos = event.pos
                 if drawing_mode == 'free':
                     points.append(start_pos)
-            elif event.button == 3:  # Right click (resize radius)
+            elif event.button == 3:  
                 radius = max(1, radius - 1)
         elif event.type == pygame.MOUSEMOTION and pygame.mouse.get_pressed()[0]:
             if drawing_mode == 'free':
@@ -76,7 +74,6 @@ while running:
 
     screen.fill((0, 0, 0))
     
-    # Draw freehand lines
     for i in range(len(points) - 1):
         drawLineBetween(screen, i, points[i], points[i + 1], radius, current_color)
     

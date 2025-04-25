@@ -5,12 +5,12 @@ import csv
 def connect():
     return psycopg2.connect(
         host="localhost",
-        database="postgres",  
-        user="postgres",           
-        password="Dakota3012"        
+        database="postgres",
+        user="postgres",
+        password="Dakota3012"
     )
 
-# Создание таблицы
+# Создание таблицы (если ещё не создана)
 def create_table():
     conn = connect()
     cur = conn.cursor()
@@ -25,38 +25,41 @@ def create_table():
     cur.close()
     conn.close()
 
-# Ввод пользователя с консоли
-def insert_user_console():
-    first_name = input("Введите имя: ")
-    phone = input("Введите номер телефона: ")
-
+# Добавление/обновление одного контакта
+def upsert_user():
+    name = input("Введите имя: ")
+    phone = input("Введите номер: ")
     conn = connect()
     cur = conn.cursor()
-    cur.execute("INSERT INTO phonebook (first_name, phone_number) VALUES (%s, %s)", (first_name, phone))
+    cur.execute("CALL upsert_user(%s, %s)", (name, phone))
     conn.commit()
     cur.close()
     conn.close()
-    print("Контакт добавлен!")
+    print("Контакт добавлен или обновлён!")
 
-# Загрузка данных из CSV
-def insert_from_csv():
+# Загрузка пользователей из CSV (bulk insert через процедуру)
+def bulk_insert_from_csv():
     filename = input("Введите имя CSV файла: ")
-    conn = connect()
-    cur = conn.cursor()
+    names = []
+    phones = []
 
     with open(filename, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
-        next(reader)  # Пропустить заголовок
+        next(reader)
         for row in reader:
             if len(row) >= 2:
-                cur.execute("INSERT INTO phonebook (first_name, phone_number) VALUES (%s, %s)", (row[0], row[1]))
+                names.append(row[0])
+                phones.append(row[1])
 
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("CALL bulk_insert_users(%s, %s)", (names, phones))
     conn.commit()
     cur.close()
     conn.close()
-    print("Данные из CSV загружены!")
+    print("Контакты из CSV обработаны.")
 
-# Обновление пользователя
+# Обновление контакта
 def update_user():
     old_name = input("Введите текущее имя: ")
     new_name = input("Новое имя (оставьте пустым если не менять): ")
@@ -73,79 +76,68 @@ def update_user():
     conn.close()
     print("Контакт обновлён!")
 
-# Поиск по фильтру
-def query_users():
-    print("Фильтр: 1 - все, 2 - по имени, 3 - по номеру")
-    choice = input("Ваш выбор: ")
-
+# Поиск по шаблону
+def search_by_pattern():
+    pattern = input("Введите шаблон (имя или номер): ")
     conn = connect()
     cur = conn.cursor()
-
-    if choice == "1":
-        cur.execute("SELECT * FROM phonebook")
-    elif choice == "2":
-        name = input("Введите имя: ")
-        cur.execute("SELECT * FROM phonebook WHERE first_name = %s", (name,))
-    elif choice == "3":
-        phone = input("Введите номер: ")
-        cur.execute("SELECT * FROM phonebook WHERE phone_number = %s", (phone,))
-    else:
-        print("Неверный выбор.")
-        return
-
+    cur.execute("SELECT * FROM search_phonebook(%s)", (pattern,))
     rows = cur.fetchall()
     for row in rows:
         print(row)
-
     cur.close()
     conn.close()
 
-# Удаление
-def delete_user():
-    print("Удалить по: 1 - имени, 2 - номеру")
-    choice = input("Ваш выбор: ")
-
+# Постраничный вывод
+def paginated_view():
+    limit = int(input("Сколько записей выводить: "))
+    offset = int(input("С какого смещения начинать: "))
     conn = connect()
     cur = conn.cursor()
+    cur.execute("SELECT * FROM get_phonebook_paginated(%s, %s)", (limit, offset))
+    rows = cur.fetchall()
+    for row in rows:
+        print(row)
+    cur.close()
+    conn.close()
 
-    if choice == "1":
-        name = input("Введите имя: ")
-        cur.execute("DELETE FROM phonebook WHERE first_name = %s", (name,))
-    elif choice == "2":
-        phone = input("Введите номер: ")
-        cur.execute("DELETE FROM phonebook WHERE phone_number = %s", (phone,))
-    else:
-        print("Неверный выбор.")
-        return
-
+# Удаление по имени или номеру
+def delete_user():
+    key = input("Введите имя или номер для удаления: ")
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("CALL delete_user_by_name_or_phone(%s)", (key,))
     conn.commit()
     cur.close()
     conn.close()
     print("Контакт удалён!")
 
-# Меню
+# Главное меню
 def main():
     create_table()
     while True:
         print("\n--- Телефонная книга ---")
-        print("1. Добавить контакт с консоли")
+        print("1. Добавить или обновить контакт")
         print("2. Загрузить контакты из CSV")
-        print("3. Обновить контакт")
-        print("4. Найти контакт")
-        print("5. Удалить контакт")
+        print("3. Обновить вручную (прямой UPDATE)")
+        print("4. Поиск по шаблону")
+        print("5. Постраничный просмотр")
+        print("6. Удалить контакт по имени или номеру")
         print("0. Выход")
 
         choice = input("Выберите опцию: ")
 
         if choice == "1":
-            insert_user_console()
+            upsert_user()
         elif choice == "2":
-            insert_from_csv()
+            bulk_insert_from_csv()
         elif choice == "3":
             update_user()
         elif choice == "4":
-            query_users()
+            search_by_pattern()
         elif choice == "5":
+            paginated_view()
+        elif choice == "6":
             delete_user()
         elif choice == "0":
             print("Выход...")
